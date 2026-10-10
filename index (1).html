@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>لعبة تخمين الرقم</title>
+  <style>
+    body {
+      font-family: Tahoma, Arial, sans-serif;
+      background-color: #f0f4f8;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+    .game {
+      background-color: white;
+      width: 100%;
+      max-width: 360px;
+      padding: 30px;
+      border-radius: 16px;
+      text-align: center;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+    h1 {
+      color: #1a5276;
+      margin-top: 0;
+    }
+    p {
+      color: #333;
+      font-size: 18px;
+    }
+    input {
+      width: 120px;
+      padding: 12px;
+      font-size: 20px;
+      text-align: center;
+      border: 2px solid #1a5276;
+      border-radius: 8px;
+    }
+    button {
+      background-color: #1a5276;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      font-size: 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      margin: 10px 4px 0;
+    }
+    button:hover {
+      background-color: #2471a3;
+    }
+    #hint {
+      font-weight: bold;
+      min-height: 28px;
+      color: #1a5276;
+    }
+    #restart {
+      display: none;
+      background-color: #28a745;
+    }
+    .stats {
+      color: #666;
+      font-size: 15px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="game">
+    <h1>🎯 خمّن الرقم</h1>
+    <p>فكرت في رقم من 1 إلى 100، تقدر تخمنه؟</p>
+
+    <input type="number" id="guess" min="1" max="100" placeholder="؟">
+    <br>
+    <button id="submit" onclick="checkGuess()">خمّن</button>
+    <button id="restart" onclick="startGame()">العب من جديد</button>
+
+    <p id="hint"></p>
+    <p class="stats">المحاولات: <span id="tries">0</span></p>
+    <p class="stats">أفضل نتيجة: <span id="best">-</span></p>
+  </div>
+
+  <script>
+    let secret;
+    let tries;
+    let best = null;
+    let gameOver;
+
+    function startGame() {
+      secret = Math.floor(Math.random() * 100) + 1;
+      tries = 0;
+      gameOver = false;
+      document.getElementById("tries").textContent = 0;
+      document.getElementById("hint").textContent = "";
+      document.getElementById("guess").value = "";
+      document.getElementById("guess").disabled = false;
+      document.getElementById("submit").style.display = "inline-block";
+      document.getElementById("restart").style.display = "none";
+      document.getElementById("guess").focus();
+    }
+
+    function checkGuess() {
+      if (gameOver) return;
+
+      const input = document.getElementById("guess");
+      const guess = parseInt(input.value);
+      const hint = document.getElementById("hint");
+
+      if (isNaN(guess) || guess < 1 || guess > 100) {
+        hint.textContent = "اكتب رقم من 1 إلى 100 ⚠️";
+        return;
+      }
+
+      tries = tries + 1;
+      document.getElementById("tries").textContent = tries;
+
+      if (guess === secret) {
+        hint.textContent = "🎉 برافو! الرقم هو " + secret + " وخمنته في " + tries + " محاولة";
+        gameOver = true;
+        input.disabled = true;
+        document.getElementById("submit").style.display = "none";
+        document.getElementById("restart").style.display = "inline-block";
+
+        if (best === null || tries < best) {
+          best = tries;
+          document.getElementById("best").textContent = best;
+        }
+      } else if (guess > secret) {
+        hint.textContent = "⬇️ أصغر من كذا";
+      } else {
+        hint.textContent = "⬆️ أكبر من كذا";
+      }
+
+      input.value = "";
+      input.focus();
+    }
+
+    document.getElementById("guess").addEventListener("keydown", function (e) {
+      if (e.key === "Enter") checkGuess();
+    });
+
+    startGame();
+  </script>
+
+</body>
+</html>
